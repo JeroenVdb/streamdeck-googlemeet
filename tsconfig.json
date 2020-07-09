@@ -1,0 +1,33 @@
+{
+	"compilerOptions": {
+		"target": "ES2018" /* Browser compatibility target or Node-mapping: https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping */,
+		"module": "commonjs",
+		"lib": [
+			"ES2019",
+			"DOM"
+		],
+		"sourceMap": true,                     /* Generates corresponding '.map' file. */
+		"outDir": "./build/be.jeroenvdb.googlemeet.sdPlugin", /* Redirect output structure to the directory. */
+		"removeComments": true,                /* Do not emit comments to output. */
+
+		/* Strict Type-Checking Options */
+		"strict": true /* Enable all strict type-checking options. */,
+
+		/* Additional Checks */
+		"noUnusedLocals": true,                /* Report errors on unused locals. */
+		"noUnusedParameters": true,            /* Report errors on unused parameters. */
+		"noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
+		"noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
+
+		/* Module Resolution Options */
+		"moduleResolution": "node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
+		"baseUrl": "." /* Base directory to resolve non-absolute module names. */,
+		"paths": {
+			"*": ["node_modules/*"]
+		},
+		"esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+	},
+	"include": [
+		"./src/**/*"
+	]
+}

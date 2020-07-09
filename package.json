@@ -1,0 +1,25 @@
+{
+  "name": "nodejs-typescript-starter",
+  "version": "1.0.0",
+  "description": "My personal NodeJS-TypeScript starter",
+  "scripts": {
+    "test": "mocha --require ts-node/register test/**/*.ts"
+  },
+  "author": "Jeroen Van den Berghe",
+  "license": "ISC",
+  "devDependencies": {
+    "@jeroenvdb/prettier-config": "^1.0.4",
+    "@types/aws-lambda": "^8.10.51",
+    "@types/chrome": "0.0.117",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^14.0.5",
+    "@types/ws": "^7.2.6",
+    "mocha": "^7.2.0",
+    "prettier": "^2.0.5",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.9.3"
+  },
+  "dependencies": {
+    "ws": "^7.3.1"
+  }
+}

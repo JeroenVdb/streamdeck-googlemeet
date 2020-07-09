@@ -1,0 +1,71 @@
+{
+  "Actions": [
+    {
+      "Icon": "images/mute",
+      "Name": "Mute",
+      "States": [
+        {
+          "Image": "images/mute",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Mute Google Meet",
+      "UUID": "be.jeroenvdb.googlemeet.mute"
+    },
+    {
+      "Icon": "images/unmute",
+      "Name": "Unmute",
+      "States": [
+        {
+          "Image": "images/unmute",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Unmute Google Meet",
+      "UUID": "be.jeroenvdb.googlemeet.unmute"
+    },
+    {
+      "Icon": "images/toggle",
+      "Name": "Toggle Mute",
+      "States": [
+        {
+          "Name": "Unmuted",
+          "Title": "Unmuted",
+          "Image": "images/unmuted",
+          "TitleAlignment": "bottom",
+          "FontSize": "12"
+        },
+        {
+          "Name": "Muted",
+          "Title": "Muted",
+          "Image": "images/muted",
+          "TitleAlignment": "bottom",
+          "FontSize": "12"
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle Google Meet mute",
+      "UUID": "be.jeroenvdb.googlemeet.togglemute"
+    }
+  ],
+  "SDKVersion": 2,
+  "Author": "Jeroen Van den Berghe",
+  "CodePath": "index.html",
+  "Description": "Controle Google Meet",
+  "Name": "Google Meet",
+  "Icon": "pluginIcon",
+  "Version": "1.0",
+  "OS": [
+    {
+      "Platform": "mac",
+      "MinimumVersion": "10.15"
+    }
+  ],
+  "Software": {
+    "MinimumVersion": "4.1"
+  }
+}
