@@ -1,12 +1,12 @@
 const SAFETY_DELAY = 100;
 
-var websocketToExtensionBridge: WebSocket;
-var websocketToPlugin: WebSocket;
+var websocketToBridge: WebSocket;
+var websocketToStreamDeck: WebSocket;
 
 openConnectionToBridge();
 
-function identifyAsPlugin() {
-	websocketToExtensionBridge.send(
+function identifyAsPlugin(): void {
+	websocketToBridge.send(
 		JSON.stringify({
 			type: 'identify',
 			value: 'iamtheplugin',
@@ -14,7 +14,7 @@ function identifyAsPlugin() {
 	);
 }
 
-function handleExtensionMessages(event: MessageEvent) {
+function handleBridgeMessages(event: MessageEvent) {
 	const msg: muteStateMessage = JSON.parse(event.data);
 	if (msg.type === 'muteState' && actionButtons['be.jeroenvdb.googlemeet.togglemute']) {
 		setTimeout(() => {
@@ -42,22 +42,22 @@ function handlePluginMessages(evt: MessageEvent) {
 }
 
 function openConnectionToBridge() {
-	if (websocketToExtensionBridge === undefined || websocketToExtensionBridge.readyState > 1) {
-		websocketToExtensionBridge = new WebSocket('ws://localhost:1987');
+	if (websocketToBridge === undefined || websocketToBridge.readyState > 1) {
+		websocketToBridge = new WebSocket('ws://localhost:1987');
 
-		websocketToExtensionBridge.addEventListener('open', identifyAsPlugin);
-		websocketToExtensionBridge.addEventListener('message', handleExtensionMessages);
+		websocketToBridge.addEventListener('open', identifyAsPlugin);
+		websocketToBridge.addEventListener('message', handleBridgeMessages);
 	}
 }
 
 function connectElgatoStreamDeckSocket(inPort: string, inPluginUUID: string, inRegisterEvent: string) {
-	websocketToPlugin = new WebSocket('ws://127.0.0.1:' + inPort);
+	websocketToStreamDeck = new WebSocket('ws://127.0.0.1:' + inPort);
 
-	websocketToPlugin.onopen = function () {
+	websocketToStreamDeck.onopen = function () {
 		registerPlugin(inPluginUUID);
 	};
 
-	websocketToPlugin.onmessage = handlePluginMessages;
+	websocketToStreamDeck.onmessage = handlePluginMessages;
 
 	function registerPlugin(inPluginUUID: string) {
 		var json = {
@@ -65,12 +65,12 @@ function connectElgatoStreamDeckSocket(inPort: string, inPluginUUID: string, inR
 			uuid: inPluginUUID,
 		};
 
-		websocketToPlugin.send(JSON.stringify(json));
+		websocketToStreamDeck.send(JSON.stringify(json));
 	}
 }
 
 function sendActionMessage(action: string) {
-	websocketToExtensionBridge.send(JSON.stringify(createAction(action)));
+	websocketToBridge.send(JSON.stringify(createAction(action)));
 }
 
 function createAction(action: string) {
@@ -96,7 +96,7 @@ const streamDeckActionToActionMap: any = {
 };
 
 function setState(inContext: string, inState: number) {
-	if (websocketToPlugin) {
+	if (websocketToStreamDeck) {
 		var json = {
 			event: 'setState',
 			context: inContext,
@@ -105,7 +105,7 @@ function setState(inContext: string, inState: number) {
 			},
 		};
 
-		websocketToPlugin.send(JSON.stringify(json));
+		websocketToStreamDeck.send(JSON.stringify(json));
 	}
 }
 
