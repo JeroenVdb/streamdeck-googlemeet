@@ -31,6 +31,7 @@ function handlePluginMessages(evt: MessageEvent) {
 
 	switch (event) {
 		case 'keyDown':
+			openConnectionToBridge();
 			sendActionMessage(action);
 			break;
 		case 'willAppear':
