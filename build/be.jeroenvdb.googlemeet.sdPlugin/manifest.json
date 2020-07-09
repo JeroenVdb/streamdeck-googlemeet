@@ -57,7 +57,7 @@
   "CodePath": "index.html",
   "Description": "Controle Google Meet",
   "Name": "Google Meet",
-  "Icon": "pluginIcon",
+  "Icon": "images/toggle",
   "Version": "1.0",
   "OS": [
     {
