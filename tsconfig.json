@@ -1,13 +1,13 @@
 {
 	"compilerOptions": {
 		"target": "ES2018" /* Browser compatibility target or Node-mapping: https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping */,
-		"module": "commonjs",
+		"module": "system",
 		"lib": [
 			"ES2019",
 			"DOM"
 		],
 		"sourceMap": true,                     /* Generates corresponding '.map' file. */
-		"outDir": "./build/be.jeroenvdb.googlemeet.sdPlugin", /* Redirect output structure to the directory. */
+		"outFile": "./build/be.jeroenvdb.googlemeet.sdPlugin/plugin.js", /* Redirect output structure to the directory. */
 		"removeComments": true,                /* Do not emit comments to output. */
 
 		/* Strict Type-Checking Options */

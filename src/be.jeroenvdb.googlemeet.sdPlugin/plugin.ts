@@ -1,24 +1,75 @@
 const SAFETY_DELAY = 100;
+const DEBUG = true;
 
-var websocketToBridge: WebSocket;
-var websocketToStreamDeck: WebSocket;
+let websocketToStreamDeck: WebSocket;
 
-openConnectionToBridge();
+let actionButtons: ActionButtons = {};
+
+class Bridge {
+	websocketToBridge: WebSocket | null;
+
+	constructor() {
+		this.websocketToBridge = null;
+		this.connect();
+	}
+
+	sendMessage(message: any) {
+		debug(`Send message to bridge: ${JSON.stringify(message)}`);
+		this.websocketToBridge?.send(JSON.stringify(message));
+	}
+
+	connect() {
+		if (this.websocketToBridge === null || this.websocketToBridge.readyState > 1) {
+			this.websocketToBridge = new WebSocket('ws://localhost:1987');
+
+			this.websocketToBridge.addEventListener('open', identifyAsPlugin);
+			this.websocketToBridge.addEventListener('message', handleBridgeMessages);
+		}
+	}
+
+}
+
+const bridge = new Bridge();
+bridge.connect();
 
 function identifyAsPlugin(): void {
-	websocketToBridge.send(
-		JSON.stringify({
-			type: 'identify',
-			value: 'iamtheplugin',
-		})
-	);
+	bridge.sendMessage({
+		type: 'identify',
+		value: 'iamtheplugin',
+	});
+}
+
+class Button {
+	streamDeckAction: string;
+	context: string;
+
+	constructor(streamDeckAction: string, context: string) {
+		this.streamDeckAction = streamDeckAction;
+		this.context = context;
+	}
+
+	setState(state: number) {
+		if (websocketToStreamDeck) {
+			var json = {
+				event: 'setState',
+				context: this.context,
+				payload: {
+					state: state,
+				},
+			};
+
+			websocketToStreamDeck.send(JSON.stringify(json));
+		}
+	}
 }
 
 function handleBridgeMessages(event: MessageEvent) {
-	const msg: muteStateMessage = JSON.parse(event.data);
+	debug(`Received message: ${event.data}`);
+	const msg: MuteStateMessage = JSON.parse(event.data);
+	console.log(actionButtons);
 	if (msg.type === 'muteState' && actionButtons['be.jeroenvdb.googlemeet.togglemute']) {
 		setTimeout(() => {
-			setState(actionButtons['be.jeroenvdb.googlemeet.togglemute'].context, msg.value === 'unmuted' ? 0 : 1);
+			actionButtons['be.jeroenvdb.googlemeet.togglemute'].setState(msg.value === 'unmuted' ? 0 : 1);
 		}, SAFETY_DELAY);
 	}
 }
@@ -31,22 +82,13 @@ function handlePluginMessages(evt: MessageEvent) {
 
 	switch (event) {
 		case 'keyDown':
-			openConnectionToBridge();
-			sendActionMessage(action);
+			bridge.connect();
+			bridge.sendMessage(new Action(action));
 			break;
 		case 'willAppear':
-			openConnectionToBridge();
-			registerActionButtons(context, action);
+			bridge.connect();
+			registerActionButton(action, context);
 			break;
-	}
-}
-
-function openConnectionToBridge() {
-	if (websocketToBridge === undefined || websocketToBridge.readyState > 1) {
-		websocketToBridge = new WebSocket('ws://localhost:1987');
-
-		websocketToBridge.addEventListener('open', identifyAsPlugin);
-		websocketToBridge.addEventListener('message', handleBridgeMessages);
 	}
 }
 
@@ -69,47 +111,49 @@ function connectElgatoStreamDeckSocket(inPort: string, inPluginUUID: string, inR
 	}
 }
 
-function sendActionMessage(action: string) {
-	websocketToBridge.send(JSON.stringify(createAction(action)));
-}
+class Action {
+	type: messageType;
+	value: ActionType;
 
-function createAction(action: string) {
-	return {
-		type: 'action',
-		value: streamDeckActionToActionMap[action],
-	};
-}
+	constructor(streamDeckAction: StreamDeckActionType) {
+		this.type = 'action';
+		this.value = this.toAction(streamDeckAction);
+	}
 
-const actionButtons: any = {};
-
-function registerActionButtons(context: string, action: string) {
-	actionButtons[action] = {
-		action: streamDeckActionToActionMap[action],
-		context: context,
-	};
-}
-
-const streamDeckActionToActionMap: any = {
-	'be.jeroenvdb.googlemeet.mute': 'mute',
-	'be.jeroenvdb.googlemeet.unmute': 'unmute',
-	'be.jeroenvdb.googlemeet.togglemute': 'togglemute',
-};
-
-function setState(inContext: string, inState: number) {
-	if (websocketToStreamDeck) {
-		var json = {
-			event: 'setState',
-			context: inContext,
-			payload: {
-				state: inState,
-			},
+	toAction(streamDeckAction: StreamDeckActionType): ActionType {
+		const streamDeckActionToActionMap: StreamDeckActionToActionMap = {
+			'be.jeroenvdb.googlemeet.mute': 'mute',
+			'be.jeroenvdb.googlemeet.unmute': 'unmute',
+			'be.jeroenvdb.googlemeet.togglemute': 'togglemute',
 		};
 
-		websocketToStreamDeck.send(JSON.stringify(json));
+		return streamDeckActionToActionMap[streamDeckAction];
 	}
 }
 
-type muteStateMessage = {
-	type: 'muteState';
+function registerActionButton(streamDeckAction: string, context: string) {
+	actionButtons[streamDeckAction] = new Button(streamDeckAction, context);
+}
+
+
+
+type StreamDeckActionType = 'be.jeroenvdb.googlemeet.mute' | 'be.jeroenvdb.googlemeet.unmute' | 'be.jeroenvdb.googlemeet.togglemute';
+type ActionType = 'mute' | 'unmute' | 'togglemute';
+type messageType = 'muteState' | 'action';
+
+function debug(message: string) {
+	if (DEBUG) console.log(message);
+}
+
+type MuteStateMessage = {
+	type: messageType;
 	value: 'muted' | 'unmuted';
+};
+
+type ActionButtons = {
+	[index: string]: Button;
+}
+
+type StreamDeckActionToActionMap = {
+	[index in StreamDeckActionType]: ActionType;
 };

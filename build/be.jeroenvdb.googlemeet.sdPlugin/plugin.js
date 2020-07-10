@@ -1,90 +1,140 @@
 "use strict";
 const SAFETY_DELAY = 100;
-var websocketToExtensionBridge;
-var websocketToPlugin;
-openConnectionToBridge();
+const DEBUG = true;
+let websocketToStreamDeck;
+let actionButtons = {};
+class Bridge {
+    constructor() {
+        this.websocketToBridge = null;
+        this.connect();
+    }
+    sendMessage(message) {
+        var _a;
+        debug(`Send message to bridge: ${JSON.stringify(message)}`);
+        (_a = this.websocketToBridge) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify(message));
+    }
+    connect() {
+        if (this.websocketToBridge === null || this.websocketToBridge.readyState > 1) {
+            this.websocketToBridge = new WebSocket('ws://localhost:1987');
+            this.websocketToBridge.addEventListener('open', identifyAsPlugin);
+            this.websocketToBridge.addEventListener('message', handleBridgeMessages);
+        }
+    }
+}
+const bridge = new Bridge();
+bridge.connect();
 function identifyAsPlugin() {
-    websocketToExtensionBridge.send(JSON.stringify({
+    bridge.sendMessage({
         type: 'identify',
         value: 'iamtheplugin',
-    }));
+    });
 }
-function handleIncommingMessages(event) {
+class Button {
+    constructor(streamDeckAction, context) {
+        this.streamDeckAction = streamDeckAction;
+        this.context = context;
+    }
+    setState(state) {
+        if (websocketToStreamDeck) {
+            var json = {
+                event: 'setState',
+                context: this.context,
+                payload: {
+                    state: state,
+                },
+            };
+            websocketToStreamDeck.send(JSON.stringify(json));
+        }
+    }
+}
+function handleBridgeMessages(event) {
+    debug(`Received message: ${event.data}`);
     const msg = JSON.parse(event.data);
+    console.log(actionButtons);
     if (msg.type === 'muteState' && actionButtons['be.jeroenvdb.googlemeet.togglemute']) {
         setTimeout(() => {
-            setState(actionButtons['be.jeroenvdb.googlemeet.togglemute'].context, msg.value === 'unmuted' ? 0 : 1);
+            actionButtons['be.jeroenvdb.googlemeet.togglemute'].setState(msg.value === 'unmuted' ? 0 : 1);
         }, SAFETY_DELAY);
     }
 }
-function openConnectionToBridge() {
-    if (websocketToExtensionBridge === undefined || websocketToExtensionBridge.readyState > 1) {
-        websocketToExtensionBridge = new WebSocket('ws://localhost:1987');
-        websocketToExtensionBridge.addEventListener('open', identifyAsPlugin);
-        websocketToExtensionBridge.addEventListener('message', handleIncommingMessages);
+function handlePluginMessages(evt) {
+    const message = JSON.parse(evt.data);
+    const event = message['event'];
+    const action = message['action'];
+    const context = message['context'];
+    switch (event) {
+        case 'keyDown':
+            bridge.connect();
+            bridge.sendMessage(new Action(action));
+            break;
+        case 'willAppear':
+            bridge.connect();
+            registerActionButton(action, context);
+            break;
     }
 }
 function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent) {
-    websocketToPlugin = new WebSocket('ws://127.0.0.1:' + inPort);
-    websocketToPlugin.onopen = function () {
+    websocketToStreamDeck = new WebSocket('ws://127.0.0.1:' + inPort);
+    websocketToStreamDeck.onopen = function () {
         registerPlugin(inPluginUUID);
     };
-    websocketToPlugin.onmessage = function (evt) {
-        const message = JSON.parse(evt.data);
-        const event = message['event'];
-        const action = message['action'];
-        const context = message['context'];
-        switch (event) {
-            case 'keyDown':
-                sendActionMessage(action);
-                break;
-            case 'willAppear':
-                openConnectionToBridge();
-                registerActionButtons(context, action);
-                break;
-        }
-    };
-    websocketToPlugin.onclose = function () {
-    };
+    websocketToStreamDeck.onmessage = handlePluginMessages;
     function registerPlugin(inPluginUUID) {
         var json = {
             event: inRegisterEvent,
             uuid: inPluginUUID,
         };
-        websocketToPlugin.send(JSON.stringify(json));
+        websocketToStreamDeck.send(JSON.stringify(json));
     }
 }
-function sendActionMessage(action) {
-    websocketToExtensionBridge.send(JSON.stringify(createAction(action)));
-}
-function createAction(action) {
-    return {
-        type: 'action',
-        value: streamDeckActionToActionMap[action],
-    };
-}
-const actionButtons = {};
-function registerActionButtons(context, action) {
-    actionButtons[action] = {
-        action: streamDeckActionToActionMap[action],
-        context: context,
-    };
-}
-const streamDeckActionToActionMap = {
-    'be.jeroenvdb.googlemeet.mute': 'mute',
-    'be.jeroenvdb.googlemeet.unmute': 'unmute',
-    'be.jeroenvdb.googlemeet.togglemute': 'togglemute',
-};
-function setState(inContext, inState) {
-    if (websocketToPlugin) {
-        var json = {
-            event: 'setState',
-            context: inContext,
-            payload: {
-                state: inState,
-            },
+class Action {
+    constructor(streamDeckAction) {
+        this.type = 'action';
+        this.value = this.toAction(streamDeckAction);
+    }
+    toAction(streamDeckAction) {
+        const streamDeckActionToActionMap = {
+            'be.jeroenvdb.googlemeet.mute': 'mute',
+            'be.jeroenvdb.googlemeet.unmute': 'unmute',
+            'be.jeroenvdb.googlemeet.togglemute': 'togglemute',
         };
-        websocketToPlugin.send(JSON.stringify(json));
+        return streamDeckActionToActionMap[streamDeckAction];
     }
 }
+function registerActionButton(streamDeckAction, context) {
+    actionButtons[streamDeckAction] = new Button(streamDeckAction, context);
+}
+function debug(message) {
+    if (DEBUG)
+        console.log(message);
+}
+System.register("Bridge", [], function (exports_1, context_1) {
+    "use strict";
+    var Bridge;
+    var __moduleName = context_1 && context_1.id;
+    return {
+        setters: [],
+        execute: function () {
+            Bridge = class Bridge {
+                constructor() {
+                    this.websocketToBridge = null;
+                    this.connect();
+                }
+                sendMessage(message) {
+                    var _a;
+                    debug(`Send message to bridge: ${JSON.stringify(message)}`);
+                    (_a = this.websocketToBridge) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify(message));
+                }
+                connect() {
+                    if (this.websocketToBridge === null || this.websocketToBridge.readyState > 1) {
+                        this.websocketToBridge = new WebSocket('ws://localhost:1987');
+                        this.websocketToBridge.addEventListener('open', identifyAsPlugin);
+                        this.websocketToBridge.addEventListener('message', handleBridgeMessages);
+                    }
+                }
+            };
+            exports_1("Bridge", Bridge);
+        }
+    };
+});
 //# sourceMappingURL=plugin.js.map
