@@ -19,12 +19,21 @@
 	    }
 	}
 
-	const DEBUG = true;
-	function debug(message) {
-	    if (DEBUG)
+	class Logger {
+	    constructor(enableDebugLogging) {
+	        this.enableDebugLogging = enableDebugLogging;
+	    }
+	    debug(message) {
+	        if (this.enableDebugLogging) {
+	            this.log(message);
+	        }
+	    }
+	    log(message) {
 	        console.log(message);
+	    }
 	}
 
+	const logger = new Logger(true);
 	class Bridge {
 	    constructor(identity, messageHandler) {
 	        this.websocketToBridge = null;
@@ -33,7 +42,7 @@
 	        this.connect();
 	    }
 	    sendMessage(message) {
-	        debug(`Send message to bridge: ${JSON.stringify(message)}`);
+	        logger.debug(`Send message to bridge: ${JSON.stringify(message)}`);
 	        if (this.websocketToBridge) {
 	            this.websocketToBridge.send(JSON.stringify(message));
 	        }
@@ -71,6 +80,7 @@
 	const SAFETY_DELAY = 100;
 	let websocketToStreamDeck;
 	let buttons = {};
+	const logger$1 = new Logger(true);
 	const bridge = new Bridge('iamtheplugin', handleBridgeMessages);
 	window.connectElgatoStreamDeckSocket = function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent) {
 	    websocketToStreamDeck = new WebSocket('ws://127.0.0.1:' + inPort);
@@ -87,7 +97,7 @@
 	    }
 	};
 	function handleBridgeMessages(event) {
-	    debug(`Received message: ${event.data}`);
+	    logger$1.debug(`Received message: ${event.data}`);
 	    const msg = JSON.parse(event.data);
 	    if (msg.type === 'muteState' && buttons['be.jeroenvdb.googlemeet.togglemute']) {
 	        setTimeout(() => {

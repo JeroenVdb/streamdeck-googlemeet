@@ -1,13 +1,14 @@
 
 import { Button } from './Button';
 import { Bridge } from './Bridge';
-import { debug } from './logging';
+import { Logger } from './Logger';
 import { Action, MessageType } from './Action';
 
 const SAFETY_DELAY = 100;
 let websocketToStreamDeck: WebSocket;
 let buttons: Buttons = {};
 
+const logger = new Logger(true);
 const bridge = new Bridge('iamtheplugin', handleBridgeMessages);
 
 // @ts-ignore
@@ -31,7 +32,7 @@ window.connectElgatoStreamDeckSocket = function connectElgatoStreamDeckSocket(in
 }
 
 function handleBridgeMessages(event: MessageEvent) {
-	debug(`Received message: ${event.data}`);
+	logger.debug(`Received message: ${event.data}`);
 	const msg: MuteStateMessage = JSON.parse(event.data);
 	if (msg.type === 'muteState' && buttons['be.jeroenvdb.googlemeet.togglemute']) {
 		setTimeout(() => {

@@ -1,4 +1,6 @@
-import { debug } from './logging';
+import { Logger } from './Logger';
+
+const logger = new Logger(true);
 
 export class Bridge {
 	websocketToBridge: WebSocket | null;
@@ -13,7 +15,7 @@ export class Bridge {
 	}
 
 	sendMessage(message: any) {
-		debug(`Send message to bridge: ${JSON.stringify(message)}`);
+		logger.debug(`Send message to bridge: ${JSON.stringify(message)}`);
 		if (this.websocketToBridge) {
 			this.websocketToBridge.send(JSON.stringify(message));
 		}
