@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "description": "My personal NodeJS-TypeScript starter",
   "scripts": {
+    "build": "npm run build:js && bash ./create-release.sh",
+    "build:js": "npx rollup -c",
     "test": "mocha --require ts-node/register test/**/*.ts"
   },
   "author": "Jeroen Van den Berghe",
   "license": "ISC",
   "devDependencies": {
     "@jeroenvdb/prettier-config": "^1.0.4",
+    "@rollup/plugin-typescript": "3.1.1",
     "@types/aws-lambda": "^8.10.51",
     "@types/chrome": "0.0.117",
     "@types/mocha": "^7.0.2",
@@ -16,7 +19,9 @@
     "@types/ws": "^7.2.6",
     "mocha": "^7.2.0",
     "prettier": "^2.0.5",
+    "rollup": "^2.21.0",
     "ts-node": "^8.10.1",
+    "tslib": "^2.0.0",
     "typescript": "^3.9.3"
   },
   "dependencies": {
