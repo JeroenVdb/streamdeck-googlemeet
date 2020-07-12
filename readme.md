@@ -13,3 +13,5 @@ _Developed and tested on MacOS, might need some work for Windows._
 - Mute microphone
 - Unmute microphone
 - Toggle microphone
+
+![Example image of the actions](example.png)
