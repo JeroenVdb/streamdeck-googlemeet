@@ -73,6 +73,9 @@
 	            'be.jeroenvdb.googlemeet.unmute': 'unmute',
 	            'be.jeroenvdb.googlemeet.togglemute': 'togglemute',
 	        };
+	        if (!streamDeckActionToActionMap[streamDeckAction]) {
+	            throw new Error(`Unsupported action: "${streamDeckAction}"`);
+	        }
 	        return streamDeckActionToActionMap[streamDeckAction];
 	    }
 	}

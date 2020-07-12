@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "ES2015" /* Browser compatibility target or Node-mapping: https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping */,
-		"module": "ES2015",
+		"module": "commonjs",
 		"lib": [
 			"ES2015",
 			"DOM"

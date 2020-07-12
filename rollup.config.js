@@ -8,6 +8,6 @@ export default {
 	},
 	treeshake: false,
 	plugins: [
-		typescript()
+		typescript({target: 'ES2015', module: 'ES2015'})
 	]
 };
