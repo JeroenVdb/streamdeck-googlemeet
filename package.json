@@ -1,7 +1,7 @@
 {
-  "name": "nodejs-typescript-starter",
-  "version": "1.0.0",
-  "description": "My personal NodeJS-TypeScript starter",
+  "name": "streamdeck-googlemeet",
+  "version": "1.0.1",
+  "description": "Stream Deck Google Meet plugin",
   "scripts": {
     "build": "npm run build:js && bash ./create-release.sh",
     "build:js": "npx rollup -c",
