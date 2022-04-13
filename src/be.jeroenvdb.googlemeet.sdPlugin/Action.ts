@@ -26,6 +26,6 @@ type StreamDeckActionToActionMap = {
 	[index in StreamDeckActionType]: ActionType;
 };
 
-type StreamDeckActionType = 'be.jeroenvdb.googlemeet.mute' | 'be.jeroenvdb.googlemeet.unmute' | 'be.jeroenvdb.googlemeet.togglemute';
-type ActionType = 'mute' | 'unmute' | 'togglemute';
+type StreamDeckActionType = 'be.jeroenvdb.googlemeet.mute' | 'be.jeroenvdb.googlemeet.unmute' | 'be.jeroenvdb.googlemeet.togglemute';
+type ActionType = 'mute' | 'unmute' | 'togglemute';
 export type MessageType = 'muteState' | 'action';

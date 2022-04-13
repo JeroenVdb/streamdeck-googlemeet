@@ -80,6 +80,13 @@
 	    }
 	}
 
+	class Request {
+	    constructor(message) {
+	        this.type = 'request';
+	        this.value = message;
+	    }
+	}
+
 	const SAFETY_DELAY = 100;
 	let websocketToStreamDeck;
 	let buttons = {};
@@ -121,6 +128,7 @@
 	        case 'willAppear':
 	            bridge.connect();
 	            registerActionButton(action, context);
+	            bridge.sendMessage(new Request('muteState'));
 	            break;
 	    }
 	}

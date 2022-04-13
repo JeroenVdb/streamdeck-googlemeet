@@ -3,7 +3,7 @@ import { Logger } from './Logger';
 const logger = new Logger(true);
 
 export class Bridge {
-	websocketToBridge: WebSocket | null;
+	websocketToBridge: WebSocket | null;
 	identity: IdentityType;
 	messageHandler: any;
 

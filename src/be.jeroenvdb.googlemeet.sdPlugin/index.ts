@@ -1,8 +1,8 @@
-
 import { Button } from './Button';
 import { Bridge } from './Bridge';
 import { Logger } from './Logger';
 import { Action, MessageType } from './Action';
+import { Request } from './Request';
 
 const SAFETY_DELAY = 100;
 let websocketToStreamDeck: WebSocket;
@@ -55,6 +55,7 @@ function handlePluginMessages(evt: MessageEvent) {
 		case 'willAppear':
 			bridge.connect();
 			registerActionButton(action, context);
+			bridge.sendMessage(new Request('muteState'));
 			break;
 	}
 }
