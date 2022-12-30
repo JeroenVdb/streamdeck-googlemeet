@@ -18,7 +18,7 @@
     "@types/node": "^14.0.5",
     "@types/rewire": "^2.5.28",
     "@types/ws": "^7.2.6",
-    "mocha": "^7.2.0",
+    "mocha": "^10.2.0",
     "prettier": "^2.0.5",
     "rewire": "^5.0.0",
     "rollup": "^2.21.0",
